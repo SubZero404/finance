@@ -42,7 +42,7 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+    return render_template('buy.html')
 
 
 @app.route("/history")
