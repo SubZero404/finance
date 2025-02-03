@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quote
+{% endblock %}
+
+{% block main %}
+    <form action="/quote" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" id="symbol" autofocus class="form-control mx-auto w-auto" name="symbol" placeholder="symbol" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Get Quote</button>
+    </form>
+    {% if quote %}
+            <h3>{{ quote['name'] }} ({{ quote['symbol'] }})</h3>
+            <p>Price: {{ quote['price']|usd }}</p>
+    {% endif %}
+    
+{% endblock %}
