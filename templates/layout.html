@@ -18,6 +18,7 @@
 
         <title>C$50 Finance: {% block title %}{% endblock %}</title>
 
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
     </head>
 
     <body>
@@ -80,7 +81,7 @@
                 });
             </script>
         </footer>
-
+        <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     </body>
 
 </html>
