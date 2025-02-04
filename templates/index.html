@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <h2>Portfolio</h2>
+    <divclass="table-responsive">
+        <table class="table table-striped table-hover table-borderless table-primary align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Symbol</th>
+                    <th>Name</th>
+                    <th>Shares</th>
+                    <th>Price</th>
+                    <th>Total Value</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for stock in stocks %}
+                    <tr class="table-primary">
+                        <td>{{ stock.symbol }}</td>
+                        <td>{{ stock.name }}</td>
+                        <td>{{ stock.total_shares }}</td>
+                        <td>{{ stock.price }}</td>
+                        <td>{{ stock.value }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="4" align="right">Cash</td>
+                    <td>{{ cash | round(2) }}</td>  
+                </tr>
+                <tr>
+                    <td colspan="4" align="right">Total Value</td>
+                    <td>{{ grand_total | round(2) }}</td>  
+                </tr>
+            </tbody>
+        </table>
+    </divclass=>
+    
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Sell
+{% endblock %}
+
+{% block main %}
+    <h2>Sell</h2>
+    <div class="container-fluid d-flex justify-content-center">
+        <div class="col-12 col-md-8 col-lg-4">
+            <form action="/sell" method="post">
+                <div class="mb-3">
+                    <select class="form-control mx-auto w-100" name="symbol" id="symbol">
+                        <option disabled selected>Select Symbol</option>
+                        {% for stock in stocks %}
+                            <option value="{{ stock.symbol }}">{{ stock.symbol }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <input autocomplete="off" id="sharess" autofocus class="form-control mx-auto w-100" name="shares" placeholder="shares" type="number">
+                </div>
+                <button class="btn btn-primary" type="submit">Sell</button>
+            </form>
+        </div>
+    </div>
+    
+{% endblock %}

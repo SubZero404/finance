@@ -35,7 +35,23 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+    user_id = session['user_id']
+
+    stocks = db.execute("SELECT symbol, SUM(shares) as total_shares FROM transactions WHERE user_id = :user_id GROUP BY symbol HAVING total_shares > 0",
+                        user_id = user_id)
+
+    cash = db.execute("SELECT cash FROM users WHERE id = :user_id", user_id = user_id)[0]['cash']
+
+    grand_total = cash
+
+    for stock in stocks:
+        quote = lookup(stock['symbol'])
+        stock["name"] = quote["name"]
+        stock["price"] = quote["price"]
+        stock["value"] = stock["price"] * stock["total_shares"]
+        grand_total += stock["value"]
+
+    return render_template('index.html', stocks = stocks, cash = cash, grand_total = grand_total)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -179,4 +195,36 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    user_id = session['user_id']
+
+    stocks = db.execute("SELECT symbol, SUM(shares) as total_shares FROM transactions WHERE user_id = :user_id GROUP BY symbol HAVING total_shares > 0",
+                            user_id = user_id)
+
+    if request.method == "POST":
+        symbol = request.form.get('symbol').upper()
+        shares = int(request.form.get('shares'))
+        
+        if not symbol or not shares or shares <= 0:
+            return apology("Please enter symbol and shares", 400)
+        
+        for stock in stocks:
+            if stock['symbol'] == symbol:
+                if stock['total_shares'] < shares:
+                    return apology("Not enough shares", 400)
+                quote = lookup(symbol)
+                if not quote:
+                    return apology("Invalid Symbol", 400)
+                price = quote['price']
+                total_sale_price = price * shares
+
+                db.execute("UPDATE users SET cash = cash + :total_sale_price WHERE id = :user_id",
+                        total_sale_price = total_sale_price, user_id = user_id)
+                
+                db.execute("INSERT INTO transactions (user_id, symbol, shares, price) VALUES (:user_id, :symbol, :shares, :price)",
+                        user_id = user_id, symbol = symbol, shares = -shares, price = price)
+                
+                flash(f"Sold {shares} shares of {symbol} for {usd(total_sale_price)}")
+                return redirect('/')
+        
+        return apology("This stock is not found in your account!", 400)
+    return render_template('sell.html', stocks = stocks)
