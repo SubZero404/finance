@@ -42,6 +42,34 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock"""
+
+    if request.method == "POST":
+        user_id = session['user_id']
+        symbol = request.form.get('symbol').upper()
+        shares = request.form.get('shares')
+        if not symbol or not shares or int(shares) <= 0:
+            return apology("Please enter symbol and shares", 400)
+        
+        quote = lookup(symbol)
+        if not quote:
+            return apology("Invalid Symbol", 400)
+        
+        price = quote['price']
+        total_price_of_shares_cost = price * int(shares)
+        cash = db.execute("SELECT cash FROM users WHERE id = :user_id", user_id = user_id)[0]['cash']
+
+        if cash < total_price_of_shares_cost:
+            return apology("No enough cash")
+        
+        db.execute("UPDATE users SET cash = cash - :shares_cost WHERE id = :user_id",
+                   shares_cost = total_price_of_shares_cost, user_id = user_id)
+        
+        db.execute("INSERT INTO transactions (user_id, symbol, shares, price) VALUES (:user_id, :symbol, :shares, :price)",
+                   user_id = user_id, symbol = symbol, shares = shares, price = price)
+        
+        flash(f"Bought {shares} shares of {symbol} for {usd(total_price_of_shares_cost)}")
+        return redirect('/')
+        
     return render_template('buy.html')
 
 
