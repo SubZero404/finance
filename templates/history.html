@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    history
+{% endblock %}
+
+{% block main %}
+    <h2>History</h2>
+    <divclass="table-responsive">
+        <table class="table table-striped table-hover table-borderless table-primary align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>No</th>
+                    <th>Symbol</th>
+                    <th>Shares</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for transaction in transactions %}
+                    <tr class="table-primary">
+                        <td>{{ transaction.id }}</td>
+                        <td>{{ transaction.symbol }}</td>
+                        <td>{{ transaction.shares }}</td>
+                        <td>{{ transaction.price }}</td>
+                        <td>{{ (transaction.shares * transaction.price) | round(2) }}</td>
+                        <td>{{ transaction.timestamp }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </divclass=>
+    
+{% endblock %}
