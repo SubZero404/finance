@@ -231,3 +231,32 @@ def sell():
         
         return apology("This stock is not found in your account!", 400)
     return render_template('sell.html', stocks = stocks)
+
+@app.route('/change-password', methods = ['GET','POST'])
+@login_required
+def changePassword():
+    if request.method == "POST":
+        user_id = session["user_id"]
+        user = db.execute("SELECT * FROM users WHERE id = :user_id", user_id = user_id)[0]
+        username = user['username']
+        password_hash = user['hash']
+
+        old_password = request.form.get('old-password')
+        new_password = request.form.get('new-password')
+        confirm_password = request.form.get('confirm-password')
+        
+        if not old_password and not new_password and not confirm_password:
+            return apology("Please enter all fill!")
+        elif not check_password_hash(password_hash, old_password):
+            return apology("Old password is incorrect!")
+        elif new_password != confirm_password:
+            return apology("confirm password not match with new password")
+        
+        new_password_hash = generate_password_hash(new_password)
+        db.execute("UPDATE users SET hash = :new_password_hash WHERE id = :user_id",
+                   new_password_hash = new_password_hash, user_id = user_id)
+        
+        flash('Password is changed!')
+        return redirect('/')
+
+    return render_template("changePassword.html")
